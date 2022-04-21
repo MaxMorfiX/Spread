@@ -6,7 +6,7 @@
     color: gray;
     background-color: gray;
     z-index: 0;
-    display: none;
+    display: block;
 }
 .mapBlock {
     position: absolute;
@@ -15,4 +15,5 @@
     border: none;
     z-index: 1;
     display: none;
+    background-size: 100% 100%;
 }
