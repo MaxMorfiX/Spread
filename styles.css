@@ -10,12 +10,30 @@
 }
 .mapBlock {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border: none;
-    z-index: 1;
-    display: block;
+    z-index: 2;
+    display: none;
     background-size: 100% 100%;
     background-color: blue;
     color: blue;
+}
+.block {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border: none;
+    z-index: 1;
+    background-size: 100% 100%;
+    background-color: red;
+    color: red;
+}
+.cycle {
+    position: absolute;
+    width: 27px;
+    height: 27px;
+    border: none;
+    z-index: 1;
+    background-size: 100% 100%;
 }
