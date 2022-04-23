@@ -1,7 +1,7 @@
 const SEP = '_';
 var field = $('#field')
 var mapSize = 3;
-var blockSize = 50;
+var blockSize = 100;
 
 startGame();
 
@@ -12,7 +12,26 @@ function startGame() {
     createMap();
 }
 function create(type, left, bottom) {
-    var html = `<div id="${left}${SEP}${bottom}" background: url('textures/${type}') onclick='', class="mapBlock" style= left: ${left}px; bottom: ${bottom}px">`;
+    
+    if(type == 'LB') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Co.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type == 'B') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Bo.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type  == 'RB') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Co.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type  == 'L') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Bo.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type  == 'C') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Ce.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type  == 'R') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Bo.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type  == 'LT') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Co.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type  == 'T') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Bo.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    } else if(type == 'RT') {
+        var html = `<div id="${left}${SEP}${bottom}" onclick="" class="mapBlock" style=" background: url('textures/Co.png'); left: ${left}px; bottom: ${bottom}px"></div>`;
+    }
     console.log(type);
     field.append(html);
 }
@@ -30,15 +49,15 @@ function createMap() {
     for (j = 0; j < mapSize; j++) {
         for (i = 0; i < mapSize; i++) {
             
-            var x = Math.floor(i*(blockSize + blockSize / 3) + blockSize / 3);
-            var y = Math.floor(j*(blockSize + blockSize / 3) + blockSize / 3);
+            var x = Math.floor(i*(blockSize + blockSize / 3));
+            var y = Math.floor(j*(blockSize + blockSize / 3));
             
             if(j == 0) {
-                createWhichBlock('LB0', 'B0', 'RB0');
+                createWhichBlock('LB', 'B', 'RB');
             } else if(j == mapSize - 1) {
-                createWhichBlock('LT0', 'T0', 'RT0');
+                createWhichBlock('LT', 'T', 'RT');
             } else {
-                createWhichBlock('L0', 'C0', 'R0');
+                createWhichBlock('L', 'C', 'R');
             }
         }
     }
