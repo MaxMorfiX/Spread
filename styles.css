@@ -28,6 +28,7 @@
     background-size: 100% 100%;
     background-color: red;
     color: red;
+    display: none;
 }
 .cycle {
     position: absolute;
