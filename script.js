@@ -33,7 +33,7 @@ function checkExplosions() {
     for(prop in energy) {
         if(energy[prop] == batteries[prop]['total']) {
             energy[prop] = 0;
-            $(`[idˆ='stBl']`).hide();
+            $(`[id^='stBl']`).hide();
 //            for(i == 0, i < $(`[idˆ=stBl${SEP}${prop}]`).lenght())
         }
     }
