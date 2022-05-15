@@ -1,5 +1,6 @@
 const SEP = '_';
-var field = $('#field')
+var field = $('#field');
+var smallBlockSize = 26;
 var mapSize = 3;
 var blockSize = 90;
 var energy = {};
@@ -19,6 +20,7 @@ function start() {
 
 function startGame() {
     createMap();
+    smallBlockSizee = $('.block').height()
     cycle();
 }
 
@@ -28,6 +30,9 @@ function cycle() {
     setTimeout(cycle, 10)
 }
 
+function bottom(id, size) {
+    return field.height() - $('#' + id).offset().top - size;
+}
 
 function checkExplosions() {
     for(prop in energy) {
@@ -38,7 +43,7 @@ function checkExplosions() {
                     flBlCount++;
                     flBl[flBlCount] = i;
                     console.log($(`#stBl${SEP + prop + SEP + i}`).offset().left)
-                    create('flBl', $(`#stBl${SEP + prop + SEP + i}`).offset().left, field.width() - $(`#stBl${SEP + prop + SEP + i}`).offset().top + smallBlockSize, flBlCount);
+                    create('flBl', $(`#stBl${SEP + prop + SEP + i}`).offset().left - 8, bottom(`stBl${SEP + prop + SEP + i}`, smallBlockSize) + 8, flBlCount);
                 }
             }
             $(`[id^='stBl${SEP}${prop}']`).hide();
