@@ -10,7 +10,7 @@ var flBlCount = 0;
 var x;
 var y;
 var smallBlockNum;
-var squarespeed = 1.8;
+var squarespeed = 2;
 
 start();
 
@@ -56,6 +56,7 @@ function bottom(id, size) {
 function checkExplosions() {
     for(prop in energy) {
         if(energy[prop] == batteries[prop]['total']) {
+            $(`#cy${prop}`).hide();
             energy[prop] = 0;
             for(i = 1; i <= 4; i++) {
                 if(batteries[prop][i]) {
@@ -73,6 +74,9 @@ function checkExplosions() {
 function addElement(x, y) {
     var j = 1;
     energy[x + SEP + y]++;
+    if(energy[x + SEP + y] == 1) {
+    $(`#cy${x}${SEP}${y}`).show();
+    }
     for(i = 1; i <= 4; i++) {
         if(batteries[x + SEP + y][i]) {
             if(j == energy[x + SEP + y]) {
@@ -100,6 +104,7 @@ function createMap() {
             x = Math.floor(i*(blockSize + blockSize / 3));
             y = field.height() - blockSize - Math.floor(j*(blockSize + blockSize / 3));
             
+            create('cycle', x + 31.5, y + 31.5);
             
             if(j == 0) {
                 if (i == 0) {
@@ -183,7 +188,7 @@ function create(type, left, bottom, other) {
     } else if(type == 'RT') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Co.png'); background-size: 100% 100%; left: ${left}px; transform: rotate(500grad); bottom: ${bottom}px"></div>`;
     } else if(type == 'cycle') {
-        var html = `<div id="cy${left}${SEP}${bottom}" class="cycle" style="background: url('textures/cycle.png'); background-size: 100% 100%; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
+        var html = `<div id="cy${left - 31.5}${SEP}${bottom - 31.5}" class="cycle" style="background: url('textures/cycle.png'); background-size: 100% 100%; color: red; left: ${left}px; bottom: ${bottom}px; display: none;"></div>`;
     } else if(type == 'block') {
         var html = `<div id="stBl${SEP + x + SEP + y + SEP + other}" class="block" style="background-color: red; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
     } else if(type == 'flBl') {
