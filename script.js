@@ -3,7 +3,7 @@ const f_createMap = true;
 const multiplierHitboxes = 32;
 var field = $('#field');
 var smallBlockSize = 18;
-var mapSize = 3;
+var mapSize = 5;
 var gamespeed = 15;
 var blockSize = 90;
 var energy = {};
@@ -14,7 +14,7 @@ var flBlCount = 0;
 var hitboxes = {};
 var x;
 var y;
-var squarespeed = 2;
+var squarespeed = 3;
 
 start();
 
@@ -47,12 +47,12 @@ function cycle() {
 
 function checkExplosions() {
     for (var prop in energy) {
-        if (energy[prop] != batteries[prop]['total']) {
+        if (energy[prop] < batteries[prop]['total']) {
             continue;
         }
         
         $(`#cy${prop}`).hide();
-        energy[prop] = 0;
+        energy[prop] -= batteries[prop]['total'];
         for (i = 1; i <= 4; i++) {
             if (!batteries[prop][i]) {
                 continue;
