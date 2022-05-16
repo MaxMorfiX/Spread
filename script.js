@@ -106,10 +106,10 @@ function checkBlocksCollisions() {
                 y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
 
                 var hitboxId = x + SEP + y;
-                if (right > hitboxes[hitboxId]['left']) {
-                    if (left < hitboxes[hitboxId]['right']) {
-                        if (top >= hitboxes[hitboxId]['bottom']) {
-                            if (bottom <= hitboxes[hitboxId]['top']) {
+                if (left >= hitboxes[hitboxId]['left']) {
+                    if (right <= hitboxes[hitboxId]['right']) {
+                        if (bottom >= hitboxes[hitboxId]['bottom']) {
+                            if (top <= hitboxes[hitboxId]['top']) {
 //                                    console.log(right + '    ' + hitboxes[hitboxId]['left'])
                                 collision(hitboxId, i);
                             }
