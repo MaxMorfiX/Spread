@@ -1,18 +1,32 @@
 const SEP = '_';
+const f_createMap = true;
+const multiplierHitboxes = 32;
 var field = $('#field');
 var smallBlockSize = 18;
 var mapSize = 3;
+var gamespeed = 100;
 var blockSize = 90;
 var energy = {};
 var batteries = {};
 var flBl = {};
 var flBlCount = 0;
+var hitboxes = {};
 var x;
 var y;
 var smallBlockNum;
 var squarespeed = 2;
 
+64;
+
 start();
+
+function get(id) {
+    return document.getElementById(id);
+}
+function bottom(id, size) {
+    return field.height() - $('#' + id).offset().top - size;
+}
+
 
 function start() {
 //    mapSize = prompt("Name");
@@ -25,32 +39,11 @@ function startGame() {
     cycle();
 }
 
-
 function cycle() {
     checkExplosions();
     moveBlocks();
-    setTimeout(cycle, 10);
-}
-
-function moveBlocks() {
-    for(i = 1; i <= flBlCount; i++) {
-        if(flBl[i] == 1) {
-            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
-        } else if(flBl[i] == 2) {
-            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
-        } else if(flBl[i] == 3) {
-            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
-        } else if(flBl[i] == 4) {
-            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
-        }
-    }
-}
-
-function get(id) {
-    return document.getElementById(id);
-}
-function bottom(id, size) {
-    return field.height() - $('#' + id).offset().top - size;
+    checkBlocksCollisions();
+    setTimeout(cycle, gamespeed);
 }
 
 function checkExplosions() {
@@ -69,6 +62,52 @@ function checkExplosions() {
             $(`[id^='stBl${SEP}${prop}']`).hide();
         }
     }
+}
+function moveBlocks() {
+    for(i = 1; i <= flBlCount; i++) {
+        if(flBl[i] == 1) {
+            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
+        } else if(flBl[i] == 2) {
+            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
+        } else if(flBl[i] == 3) {
+            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
+        } else if(flBl[i] == 4) {
+            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
+        }
+    }
+}
+function checkBlocksCollisions() {
+    $('.flBl').each(function() {
+        var left = this.offsetLeft;
+        var bottom = field.height() - this.offsetTop - smallBlockSize;
+        var right = left + smallBlockSize;
+        var top = bottom + smallBlockSize;
+        
+        for (j = 0; j < mapSize; j++) {
+            for (i = 0; i < mapSize; i++) {
+                
+                x = Math.floor(i * (blockSize + blockSize / 3));
+                y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
+                
+                if (right > hitboxes[x + SEP + y]['left']) {
+                    if (left < hitboxes[x + SEP + y]['right']) {
+                        if (top >= hitboxes[x + SEP + y]['bottom']) {
+                            if (bottom <= hitboxes[x + SEP + y]['top']) {
+                                console.log(right + '    ' + hitboxes[x + SEP + y]['left'])
+                                addColEl(hitboxes[x + SEP + y]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function addColEl(hitboxes) {
+    var x = hitboxes['left'] - multiplierHitboxes;
+    var y = hitboxes['bottom'] - multiplierHitboxes;
+    addElement(x, y);
 }
 
 function addElement(x, y) {
@@ -104,69 +143,82 @@ function createMap() {
             x = Math.floor(i*(blockSize + blockSize / 3));
             y = field.height() - blockSize - Math.floor(j*(blockSize + blockSize / 3));
             
+            var currBlock = {};
+            addHitboxes()
+            
             create('cycle', x + 31.5, y + 31.5);
             
-            if(j == 0) {
-                if (i == 0) {
-                    create('LT', x, y);
+            if(f_createMap) {
+                if(j == 0) {
+                    if (i == 0) {
+                        create('LT', x, y);
+                        create('block', x + 62, y + 32, 3);
+                        create('block', x + 32, y + 2, 4);
+                        currBattery = {1: false, 2: false, 3: true, 4: true, 'total': 2};
+                    } else if (i == mapSize - 1) {
+                        create('RT', x, y);
+                        create('block', x + 2, y + 32, 2);
+                        create('block', x + 32, y + 2, 4);
+                        currBattery = {1: false, 2: true, 3: false, 4: true, 'total': 2};
+                    } else {
+                        create('T', x, y);
+                        create('block', x + 2, y + 32, 2);
+                        create('block', x + 62, y + 32, 3);
+                        create('block', x + 32, y + 2, 4);
+                        currBattery = {1: false, 2: true, 3: true, 4: true, 'total': 3};
+                    }
+                } else if(j == mapSize - 1) {
+                    if (i == 0) {
+                        create('LB', x, y);
+                        create('block', x + 32, y + 62, 1, 1);
+                        create('block', x + 62, y + 32, 3, 3);
+                        currBattery = {1: true, 2: false, 3: true, 4: false, 'total': 2};
+                    } else if (i == mapSize - 1) {
+                        create('RB', x, y);
+                        create('block', x + 32, y + 62, 1);
+                        create('block', x + 2, y + 32, 2);
+                        currBattery = {1: true, 2: true, 3: false, 4: false, 'total': 2};
+                    } else {
+                        create('B', x, y);
+                        create('block', x + 32, y + 62, 1);
+                        create('block', x + 2, y + 32, 2);
+                        create('block', x + 62, y + 32, 3);
+                        currBattery = {1: true, 2: true, 3: true, 4: false, 'total': 3};
+                    }
+                } else if (i == 0) {
+                    create('L', x, y);
+                    create('block', x + 32, y + 62, 1);
                     create('block', x + 62, y + 32, 3);
                     create('block', x + 32, y + 2, 4);
-                    currBattery = {1: false, 2: false, 3: true, 4: true, 'total': 2};
+                    currBattery = {1: true, 2: false, 3: true, 4: true, 'total': 3};
                 } else if (i == mapSize - 1) {
-                    create('RT', x, y);
-                    create('block', x + 2, y + 32, 2);
-                    create('block', x + 32, y + 2, 4);
-                    currBattery = {1: false, 2: true, 3: false, 4: true, 'total': 2};
-                } else {
-                    create('T', x, y);
-                    create('block', x + 2, y + 32, 2);
-                    create('block', x + 62, y + 32, 3);
-                    create('block', x + 32, y + 2, 4);
-                    currBattery = {1: false, 2: true, 3: true, 4: true, 'total': 3};
-                }
-            } else if(j == mapSize - 1) {
-                if (i == 0) {
-                    create('LB', x, y);
-                    create('block', x + 32, y + 62, 1, 1);
-                    create('block', x + 62, y + 32, 3, 3);
-                    currBattery = {1: true, 2: false, 3: true, 4: false, 'total': 2};
-                } else if (i == mapSize - 1) {
-                    create('RB', x, y);
+                    create('R', x, y);
                     create('block', x + 32, y + 62, 1);
                     create('block', x + 2, y + 32, 2);
-                    currBattery = {1: true, 2: true, 3: false, 4: false, 'total': 2};
+                    create('block', x + 32, y + 2, 4);
+                    currBattery = {1: true, 2: true, 3: false, 4: true, 'total': 3};
                 } else {
-                    create('B', x, y);
+                    create('C', x, y);
                     create('block', x + 32, y + 62, 1);
                     create('block', x + 2, y + 32, 2);
                     create('block', x + 62, y + 32, 3);
-                    currBattery = {1: true, 2: true, 3: true, 4: false, 'total': 3};
+                    create('block', x + 32, y + 2, 4);
+                    currBattery = {1: true, 2: true, 3: true, 4: true, 'total': 4};
                 }
-            } else if (i == 0) {
-                create('L', x, y);
-                create('block', x + 32, y + 62, 1);
-                create('block', x + 62, y + 32, 3);
-                create('block', x + 32, y + 2, 4);
-                currBattery = {1: true, 2: false, 3: true, 4: true, 'total': 3};
-            } else if (i == mapSize - 1) {
-                create('R', x, y);
-                create('block', x + 32, y + 62, 1);
-                create('block', x + 2, y + 32, 2);
-                create('block', x + 32, y + 2, 4);
-                currBattery = {1: true, 2: true, 3: false, 4: true, 'total': 3};
-            } else {
-                create('C', x, y);
-                create('block', x + 32, y + 62, 1);
-                create('block', x + 2, y + 32, 2);
-                create('block', x + 62, y + 32, 3);
-                create('block', x + 32, y + 2, 4);
-                currBattery = {1: true, 2: true, 3: true, 4: true, 'total': 4};
+                energy[x + SEP + y] = 0;
+                batteries[x + SEP + y] = currBattery;
             }
-            energy[x + SEP + y] = 0;
-            batteries[x + SEP + y] = currBattery;
+        }
+        function addHitboxes() {
+            currBlock['left'] = x + multiplierHitboxes;
+            currBlock['right'] = x + blockSize - multiplierHitboxes;
+            currBlock['top'] = y + blockSize - multiplierHitboxes;
+            currBlock['bottom'] = y + multiplierHitboxes;
+            hitboxes[x + SEP + y] = currBlock;
         }
     }
-  $('.mapBlock').show();
+    console.log(hitboxes)
+    $('.mapBlock').show();
 }
 function create(type, left, bottom, other) {
     if(type == 'LB') {
@@ -192,7 +244,7 @@ function create(type, left, bottom, other) {
     } else if(type == 'block') {
         var html = `<div id="stBl${SEP + x + SEP + y + SEP + other}" class="block" style="background-color: red; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
     } else if(type == 'flBl') {
-        var html = `<div id="flBl${SEP}${other}" class="block" style="display: block; background-color: red; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
+        var html = `<div id="flBl${SEP}${other}" class="flBl" style="display: block; background-color: red; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
     }
 //    console.log(type);
     field.append(html);

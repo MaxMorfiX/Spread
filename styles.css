@@ -30,6 +30,17 @@
     color: red;
     display: none;
 }
+.flBl {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border: none;
+    z-index: 3;
+    background-size: 100% 100%;
+    background-color: red;
+    color: red;
+    display: none;
+}
 .cycle {
     position: absolute;
     width: 27px;
