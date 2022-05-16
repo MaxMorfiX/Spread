@@ -16,7 +16,6 @@ var x;
 var y;
 var squarespeed = 2;
 
-
 start();
 
 function get(id) {
@@ -46,12 +45,12 @@ function cycle() {
 }
 
 function checkExplosions() {
-    for(prop in energy) {
-        if(energy[prop] == batteries[prop]['total']) {
+    for (var prop in energy) {
+        if (energy[prop] == batteries[prop]['total']) {
             $(`#cy${prop}`).hide();
             energy[prop] = 0;
-            for(i = 1; i <= 4; i++) {
-                if(batteries[prop][i]) {
+            for (i = 1; i <= 4; i++) {
+                if (batteries[prop][i]) {
                     flBlCount++;
                     flBl[flBlCount] = i;
                     flBlIsAlive[flBlCount] = true;
@@ -64,24 +63,24 @@ function checkExplosions() {
     }
 }
 function moveBlocks() {
-    for(i = 1; i <= flBlCount; i++) {
+    for (i = 1; i <= flBlCount; i++) {
 //        console.log(flBlIsAlive)
-        if(flBlIsAlive[i]) {
-            if(flBl[i] == 1) {
+        if (flBlIsAlive[i]) {
+            if (flBl[i] == 1) {
                 get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
-            } else if(flBl[i] == 2) {
+            } else if (flBl[i] == 2) {
                 $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
-            } else if(flBl[i] == 3) {
+            } else if (flBl[i] == 3) {
                 $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
-            } else if(flBl[i] == 4) {
+            } else if (flBl[i] == 4) {
                 get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
             }
         }
     }
 }
 function checkBlocksCollisions() {
-    for(i = 1; i <= flBlCount; i++) {
-        if(flBlIsAlive[i]) {
+    for (i = 1; i <= flBlCount; i++) {
+        if (flBlIsAlive[i]) {
             var left = $('#flBl' + SEP + i).offset().left;
             var bottom = field.height() - $('#flBl' + SEP + i).offset().top - smallBlockSize;
             var right = left + smallBlockSize;
@@ -121,12 +120,12 @@ function collision(name, object) {
 function addElement(x, y) {
     var j = 1;
     energy[x + SEP + y]++;
-    if(energy[x + SEP + y] == 1) {
-    $(`#cy${x}${SEP}${y}`).show();
+    if (energy[x + SEP + y] == 1) {
+        $(`#cy${x}${SEP}${y}`).show();
     }
-    for(i = 1; i <= 4; i++) {
-        if(batteries[x + SEP + y][i]) {
-            if(j == energy[x + SEP + y]) {
+    for (i = 1; i <= 4; i++) {
+        if (batteries[x + SEP + y][i]) {
+            if (j == energy[x + SEP + y]) {
                 $('#stBl' + SEP + x + SEP + y + SEP + i).show();
 //                console.log('add element  ' + i + '     ' + $('#stBl' + SEP + x + SEP + y + SEP + i).lenght);
                 break;
@@ -155,8 +154,8 @@ function createMap() {
             
             create('cycle', x + 31.5, y + 31.5);
             
-            if(f_createMap) {
-                if(j == 0) {
+            if (f_createMap) {
+                if (j == 0) {
                     if (i == 0) {
                         create('LT', x, y);
                         create('block', x + 62, y + 32, 3);
@@ -174,7 +173,7 @@ function createMap() {
                         create('block', x + 32, y + 2, 4);
                         currBattery = {1: false, 2: true, 3: true, 4: true, 'total': 3};
                     }
-                } else if(j == mapSize - 1) {
+                } else if (j == mapSize - 1) {
                     if (i == 0) {
                         create('LB', x, y);
                         create('block', x + 32, y + 62, 1, 1);
@@ -228,29 +227,29 @@ function createMap() {
     $('.mapBlock').show();
 }
 function create(type, left, bottom, other) {
-    if(type == 'LB') {
+    if (type == 'LB') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Co.png'); background-size: 100% 100%; transform: rotate(1500grad); left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type == 'B') {
+    } else if (type == 'B') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Bo.png'); background-size: 100% 100%; transform: rotate(1500grad); left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type  == 'RB') {
+    } else if (type  == 'RB') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Co.png'); background-size: 100% 100%; transform: rotate(1000grad); left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type  == 'L') {
+    } else if (type  == 'L') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Bo.png'); background-size: 100% 100%; left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type  == 'C') {
+    } else if (type  == 'C') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Ce.png'); background-size: 100% 100%; left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type  == 'R') {
+    } else if (type  == 'R') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Bo.png'); background-size: 100% 100%; transform: rotate(1000grad); left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type  == 'LT') {
+    } else if (type  == 'LT') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Co.png'); background-size: 100% 100%; left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type  == 'T') {
+    } else if (type  == 'T') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Bo.png'); background-size: 100% 100%; transform: rotate(500grad); left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type == 'RT') {
+    } else if (type == 'RT') {
         var html = `<div id="${left}${SEP}${bottom}" onclick="addElement(${left}, ${bottom});" class="mapBlock" style=" background: url('textures/Co.png'); background-size: 100% 100%; left: ${left}px; transform: rotate(500grad); bottom: ${bottom}px"></div>`;
-    } else if(type == 'cycle') {
+    } else if (type == 'cycle') {
         var html = `<div id="cy${left - 31.5}${SEP}${bottom - 31.5}" class="cycle" style="background: url('textures/cycle.png'); background-size: 100% 100%; color: red; left: ${left}px; bottom: ${bottom}px; display: none;"></div>`;
-    } else if(type == 'block') {
+    } else if (type == 'block') {
         var html = `<div id="stBl${SEP + x + SEP + y + SEP + other}" class="block" style="background-color: red; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
-    } else if(type == 'flBl') {
+    } else if (type == 'flBl') {
         var html = `<div id="flBl${SEP}${other}" class="flBl" style="display: block; background-color: red; color: red; left: ${left}px; bottom: ${bottom}px"></div>`;
     }
 //    console.log(type);
