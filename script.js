@@ -89,7 +89,7 @@ function moveBlocks() {
     }
 }
 function checkBlocksCollisions() {
-    for (i = 1; i <= flBlCount; i++) {
+    for (var i = 1; i <= flBlCount; i++) {
         if (!flBlIsAlive[i]) {
             continue;
         }
@@ -99,10 +99,10 @@ function checkBlocksCollisions() {
         var right = left + smallBlockSize;
         var top = bottom + smallBlockSize;
 
-        for (j = 0; j < mapSize; j++) {
-            for (i = 0; i < mapSize; i++) {
+        for (var j = 0; j < mapSize; j++) {
+            for (var k = 0; k < mapSize; k++) {
 
-                x = Math.floor(i * (blockSize + blockSize / 3));
+                x = Math.floor(k * (blockSize + blockSize / 3));
                 y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
 
                 var hitboxId = x + SEP + y;
