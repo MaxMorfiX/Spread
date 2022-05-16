@@ -21,8 +21,9 @@ start();
 function get(id) {
     return document.getElementById(id);
 }
-function bottom(id, size) {
-    return field.height() - $('#' + id).offset().top - size;
+function bottom(selector, size) {
+    size = size || smallBlockSize;
+    return field.height() - $(selector).offset().top - size;
 }
 
 
@@ -46,59 +47,71 @@ function cycle() {
 
 function checkExplosions() {
     for (var prop in energy) {
-        if (energy[prop] == batteries[prop]['total']) {
-            $(`#cy${prop}`).hide();
-            energy[prop] = 0;
-            for (i = 1; i <= 4; i++) {
-                if (batteries[prop][i]) {
-                    flBlCount++;
-                    flBl[flBlCount] = i;
-                    flBlIsAlive[flBlCount] = true;
-//                    console.log($(`#stBl${SEP + prop + SEP + i}`).offset().left)
-                    create('flBl', $(`#stBl${SEP + prop + SEP + i}`).offset().left - 8, bottom(`stBl${SEP + prop + SEP + i}`, smallBlockSize), flBlCount);
-                }
-            }
-            $(`[id^='stBl${SEP}${prop}']`).hide();
+        if (energy[prop] != batteries[prop]['total']) {
+            continue;
         }
+        
+        $(`#cy${prop}`).hide();
+        energy[prop] = 0;
+        for (i = 1; i <= 4; i++) {
+            if (!batteries[prop][i]) {
+                continue;
+            }
+            
+            flBlCount++;
+            flBl[flBlCount] = i;
+            flBlIsAlive[flBlCount] = true;
+//                    console.log($(`#stBl${SEP + prop + SEP + i}`).offset().left)
+            var stBlSelector = `#stBl${SEP + prop + SEP + i}`;
+            create('flBl', $(stBlSelector).offset().left - 8, bottom(stBlSelector), flBlCount);
+        }
+        $(`[id^='stBl${SEP}${prop}']`).hide();
     }
 }
 function moveBlocks() {
     for (i = 1; i <= flBlCount; i++) {
 //        console.log(flBlIsAlive)
-        if (flBlIsAlive[i]) {
-            if (flBl[i] == 1) {
-                get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
-            } else if (flBl[i] == 2) {
-                $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
-            } else if (flBl[i] == 3) {
-                $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
-            } else if (flBl[i] == 4) {
-                get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
-            }
+        if (!flBlIsAlive[i]) {
+            continue;
+        }
+        
+        var flBlSelector = '#flBl' + SEP + i;
+        
+        if (flBl[i] == 1) {
+            get('flBl' + SEP + i).style.bottom = bottom(flBlSelector) + squarespeed + 'px';
+        } else if (flBl[i] == 2) {
+            $(flBlSelector).offset({left: $(flBlSelector).offset().left - squarespeed});
+        } else if (flBl[i] == 3) {
+            $(flBlSelector).offset({left: $(flBlSelector).offset().left + squarespeed});
+        } else if (flBl[i] == 4) {
+            get('flBl' + SEP + i).style.bottom = bottom(flBlSelector) - squarespeed + 'px';
         }
     }
 }
 function checkBlocksCollisions() {
     for (i = 1; i <= flBlCount; i++) {
-        if (flBlIsAlive[i]) {
-            var left = $('#flBl' + SEP + i).offset().left;
-            var bottom = field.height() - $('#flBl' + SEP + i).offset().top - smallBlockSize;
-            var right = left + smallBlockSize;
-            var top = bottom + smallBlockSize;
-            
-            for (j = 0; j < mapSize; j++) {
-                for (i = 0; i < mapSize; i++) {
-                    
-                    x = Math.floor(i * (blockSize + blockSize / 3));
-                    y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
-                    
-                    if (right > hitboxes[x + SEP + y]['left']) {
-                        if (left < hitboxes[x + SEP + y]['right']) {
-                            if (top >= hitboxes[x + SEP + y]['bottom']) {
-                                if (bottom <= hitboxes[x + SEP + y]['top']) {
-//                                    console.log(right + '    ' + hitboxes[x + SEP + y]['left'])
-                                    collision(x + SEP + y, i);
-                                }
+        if (!flBlIsAlive[i]) {
+            continue;
+        }
+        
+        var left = $('#flBl' + SEP + i).offset().left;
+        var bottom = field.height() - $('#flBl' + SEP + i).offset().top - smallBlockSize;
+        var right = left + smallBlockSize;
+        var top = bottom + smallBlockSize;
+
+        for (j = 0; j < mapSize; j++) {
+            for (i = 0; i < mapSize; i++) {
+
+                x = Math.floor(i * (blockSize + blockSize / 3));
+                y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
+
+                var hitboxId = x + SEP + y;
+                if (right > hitboxes[hitboxId]['left']) {
+                    if (left < hitboxes[hitboxId]['right']) {
+                        if (top >= hitboxes[hitboxId]['bottom']) {
+                            if (bottom <= hitboxes[hitboxId]['top']) {
+//                                    console.log(right + '    ' + hitboxes[hitboxId]['left'])
+                                collision(hitboxId, i);
                             }
                         }
                     }
@@ -108,35 +121,38 @@ function checkBlocksCollisions() {
     }
 }
 
-function collision(name, object) {
+function collision(name, object_id) {
     var x = hitboxes[name]['left'] - multiplierHitboxes;
     var y = hitboxes[name]['bottom'] - multiplierHitboxes;
-    console.log(object)
-    flBlIsAlive[object] = false;
-    $('#flBl' + SEP + object).remove();
+    console.log(object_id)
+    flBlIsAlive[object_id] = false;
+    $('#flBl' + SEP + object_id).remove();
     addElement(x, y);
 }
 
 function addElement(x, y) {
     var j = 1;
-    energy[x + SEP + y]++;
-    if (energy[x + SEP + y] == 1) {
+    var blId = x + SEP + y;
+    energy[blId]++;
+    
+    if (energy[blId] == 1) {
         $(`#cy${x}${SEP}${y}`).show();
     }
+
     for (i = 1; i <= 4; i++) {
-        if (batteries[x + SEP + y][i]) {
-            if (j == energy[x + SEP + y]) {
-                $('#stBl' + SEP + x + SEP + y + SEP + i).show();
-//                console.log('add element  ' + i + '     ' + $('#stBl' + SEP + x + SEP + y + SEP + i).lenght);
-                break;
-            } else {
-                j++;
-            }
+        if (!batteries[blId][i]) {
+            continue;
         }
+        
+        if (j == energy[blId]) {
+            $('#stBl' + SEP + blId + SEP + i).show();
+//            console.log('add element  ' + i + '     ' + $('#stBl' + SEP + blId + SEP + i).lenght);
+            return;
+        }
+        
+        j++;
     }
 }
-
-
 
 
 function createMap() {
