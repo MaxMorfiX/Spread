@@ -3,7 +3,7 @@ const f_createMap = true;
 const multiplierHitboxes = 32;
 var field = $('#field');
 var smallBlockSize = 18;
-var mapSize = 5;
+var mapSize = 3;
 var gamespeed = 15;
 var blockSize = 90;
 var energy = {};
@@ -33,6 +33,7 @@ function start() {
 }
 
 function startGame() {
+    mapSize = prompt('map size');
     createMap();
     smallBlockSizee = $('.block').height();
     cycle();
