@@ -4,19 +4,18 @@ const multiplierHitboxes = 32;
 var field = $('#field');
 var smallBlockSize = 18;
 var mapSize = 3;
-var gamespeed = 100;
+var gamespeed = 15;
 var blockSize = 90;
 var energy = {};
 var batteries = {};
 var flBl = {};
+var flBlIsAlive = {};
 var flBlCount = 0;
 var hitboxes = {};
 var x;
 var y;
-var smallBlockNum;
 var squarespeed = 2;
 
-64;
 
 start();
 
@@ -35,7 +34,7 @@ function start() {
 
 function startGame() {
     createMap();
-    smallBlockSizee = $('.block').height()
+    smallBlockSizee = $('.block').height();
     cycle();
 }
 
@@ -55,6 +54,7 @@ function checkExplosions() {
                 if(batteries[prop][i]) {
                     flBlCount++;
                     flBl[flBlCount] = i;
+                    flBlIsAlive[flBlCount] = true;
 //                    console.log($(`#stBl${SEP + prop + SEP + i}`).offset().left)
                     create('flBl', $(`#stBl${SEP + prop + SEP + i}`).offset().left - 8, bottom(`stBl${SEP + prop + SEP + i}`, smallBlockSize), flBlCount);
                 }
@@ -65,48 +65,56 @@ function checkExplosions() {
 }
 function moveBlocks() {
     for(i = 1; i <= flBlCount; i++) {
-        if(flBl[i] == 1) {
-            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
-        } else if(flBl[i] == 2) {
-            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
-        } else if(flBl[i] == 3) {
-            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
-        } else if(flBl[i] == 4) {
-            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
+//        console.log(flBlIsAlive)
+        if(flBlIsAlive[i]) {
+            if(flBl[i] == 1) {
+                get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
+            } else if(flBl[i] == 2) {
+                $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
+            } else if(flBl[i] == 3) {
+                $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
+            } else if(flBl[i] == 4) {
+                get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
+            }
         }
     }
 }
 function checkBlocksCollisions() {
-    $('.flBl').each(function() {
-        var left = this.offsetLeft;
-        var bottom = field.height() - this.offsetTop - smallBlockSize;
-        var right = left + smallBlockSize;
-        var top = bottom + smallBlockSize;
-        
-        for (j = 0; j < mapSize; j++) {
-            for (i = 0; i < mapSize; i++) {
-                
-                x = Math.floor(i * (blockSize + blockSize / 3));
-                y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
-                
-                if (right > hitboxes[x + SEP + y]['left']) {
-                    if (left < hitboxes[x + SEP + y]['right']) {
-                        if (top >= hitboxes[x + SEP + y]['bottom']) {
-                            if (bottom <= hitboxes[x + SEP + y]['top']) {
-                                console.log(right + '    ' + hitboxes[x + SEP + y]['left'])
-                                addColEl(hitboxes[x + SEP + y]);
+    for(i = 1; i <= flBlCount; i++) {
+        if(flBlIsAlive[i]) {
+            var left = $('#flBl' + SEP + i).offset().left;
+            var bottom = field.height() - $('#flBl' + SEP + i).offset().top - smallBlockSize;
+            var right = left + smallBlockSize;
+            var top = bottom + smallBlockSize;
+            
+            for (j = 0; j < mapSize; j++) {
+                for (i = 0; i < mapSize; i++) {
+                    
+                    x = Math.floor(i * (blockSize + blockSize / 3));
+                    y = field.height() - blockSize - Math.floor(j * (blockSize + blockSize / 3));
+                    
+                    if (right > hitboxes[x + SEP + y]['left']) {
+                        if (left < hitboxes[x + SEP + y]['right']) {
+                            if (top >= hitboxes[x + SEP + y]['bottom']) {
+                                if (bottom <= hitboxes[x + SEP + y]['top']) {
+//                                    console.log(right + '    ' + hitboxes[x + SEP + y]['left'])
+                                    collision(x + SEP + y, i);
+                                }
                             }
                         }
                     }
                 }
             }
         }
-    });
+    }
 }
 
-function addColEl(hitboxes) {
-    var x = hitboxes['left'] - multiplierHitboxes;
-    var y = hitboxes['bottom'] - multiplierHitboxes;
+function collision(name, object) {
+    var x = hitboxes[name]['left'] - multiplierHitboxes;
+    var y = hitboxes[name]['bottom'] - multiplierHitboxes;
+    console.log(object)
+    flBlIsAlive[object] = false;
+    $('#flBl' + SEP + object).remove();
     addElement(x, y);
 }
 
@@ -137,7 +145,6 @@ function createMap() {
     for (j = 0; j < mapSize; j++) {
         for (i = 0; i < mapSize; i++) {
             
-            smallBlockNum = 1;
             var currBattery = {};
             
             x = Math.floor(i*(blockSize + blockSize / 3));
@@ -217,7 +224,7 @@ function createMap() {
             hitboxes[x + SEP + y] = currBlock;
         }
     }
-    console.log(hitboxes)
+//    console.log(hitboxes)
     $('.mapBlock').show();
 }
 function create(type, left, bottom, other) {
