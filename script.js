@@ -1,6 +1,6 @@
 const SEP = '_';
 var field = $('#field');
-var smallBlockSize = 26;
+var smallBlockSize = 18;
 var mapSize = 3;
 var blockSize = 90;
 var energy = {};
@@ -10,6 +10,7 @@ var flBlCount = 0;
 var x;
 var y;
 var smallBlockNum;
+var squarespeed = 1.8;
 
 start();
 
@@ -27,9 +28,27 @@ function startGame() {
 
 function cycle() {
     checkExplosions();
-    setTimeout(cycle, 10)
+    moveBlocks();
+    setTimeout(cycle, 10);
 }
 
+function moveBlocks() {
+    for(i = 1; i <= flBlCount; i++) {
+        if(flBl[i] == 1) {
+            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) + squarespeed + 'px';
+        } else if(flBl[i] == 2) {
+            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left - squarespeed});
+        } else if(flBl[i] == 3) {
+            $('#flBl' + SEP + i).offset({left: $('#flBl' + SEP + i).offset().left + squarespeed});
+        } else if(flBl[i] == 4) {
+            get('flBl' + SEP + i).style.bottom = bottom('flBl' + SEP + i, smallBlockSize) - squarespeed + 'px';
+        }
+    }
+}
+
+function get(id) {
+    return document.getElementById(id);
+}
 function bottom(id, size) {
     return field.height() - $('#' + id).offset().top - size;
 }
@@ -42,8 +61,8 @@ function checkExplosions() {
                 if(batteries[prop][i]) {
                     flBlCount++;
                     flBl[flBlCount] = i;
-                    console.log($(`#stBl${SEP + prop + SEP + i}`).offset().left)
-                    create('flBl', $(`#stBl${SEP + prop + SEP + i}`).offset().left - 8, bottom(`stBl${SEP + prop + SEP + i}`, smallBlockSize) + 8, flBlCount);
+//                    console.log($(`#stBl${SEP + prop + SEP + i}`).offset().left)
+                    create('flBl', $(`#stBl${SEP + prop + SEP + i}`).offset().left - 8, bottom(`stBl${SEP + prop + SEP + i}`, smallBlockSize), flBlCount);
                 }
             }
             $(`[id^='stBl${SEP}${prop}']`).hide();
@@ -58,7 +77,7 @@ function addElement(x, y) {
         if(batteries[x + SEP + y][i]) {
             if(j == energy[x + SEP + y]) {
                 $('#stBl' + SEP + x + SEP + y + SEP + i).show();
-                console.log('add element  ' + i + '     ' + $('#stBl' + SEP + x + SEP + y + SEP + i).lenght);
+//                console.log('add element  ' + i + '     ' + $('#stBl' + SEP + x + SEP + y + SEP + i).lenght);
                 break;
             } else {
                 j++;
