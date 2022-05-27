@@ -28,7 +28,7 @@ function bottom(selector, size) {
 
 
 function start() {
-//    mapSize = prompt("Name");
+ //    mapSize = prompt("Name");
     startGame();
 }
 
