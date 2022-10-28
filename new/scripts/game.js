@@ -1,9 +1,11 @@
 const SEP = '_';
 let sceneController = new SceneController();
 let cells = [];
+let flBlocks = [];
 let gameField = $('#gameSquare');
 let cellSize;
 let pixMult;
+
 
 
 
@@ -19,7 +21,6 @@ class Game {
     start() {
         this.createMap(this.mapSize);
     }
-    
     
     createMap(size) {
         
@@ -59,26 +60,39 @@ class Game {
             }
         }
         
-        $('.cell, .stableBlock').show();
+        $('.cell').show();
         $('.cell').width(cellSize).height(cellSize);
         
     }
 }
 
 
+    
 
+class GameObject {
+    htmlId;
+    
+    show() {
+        $('#' + this.htmlId).show();
+    }
+    hide() {
+        $('#' + this.htmlId).hide();
+    }
+}
 
-class Cell {
+class Cell extends GameObject {
     
     x;
     y;
     type;
     id;
     stableBlocks = [];
-    batteries;
+    batteries = {};
     cycle;
+    power = 0;
     
     constructor(pos, type) {
+        super();
         
 //        console.log('type: ' + type + ', x: ' + pos.x + ', y: ' + pos.y);
         
@@ -119,7 +133,7 @@ class Cell {
             this.batteries = {1: false, 2: false, 3: true, 4: true, 'total': 2};
         }
         
-        gameField.append(html);
+        $('#cellsContainer').append(html);
         
         if(this.batteries['1'])
             this.stableBlocks.push(new StableBlock(vec2(32, 62), this, this.stableBlocks.length));
@@ -136,11 +150,30 @@ class Cell {
     
     addElement() {
         
+        this.stableBlocks[this.power].show();
+        
+        if(this.power === 0) {
+            this.cycle.show();
+        } else if(this.power + 1 >= this.batteries.total) {
+            this.explode();
+            return;
+        }
+        
+        this.power++;
+        
     }
     
+    explode() {
+        this.cycle.hide();
+        for(let i in this.stableBlocks) {
+            this.stableBlocks[i].hide();
+            flBlocks.push(new FlyingBlock(this, vec2(this.stableBlocks[i].x, this.stableBlocks[i].y)));
+        }
+        this.power = 0;
+    }
 }
 
-class StableBlock {
+class StableBlock extends GameObject {
     
     x;
     y;
@@ -148,6 +181,8 @@ class StableBlock {
     htmlId;
     
     constructor(pos, owner, id) {
+        super();
+        
         this.x = pos.x*pixMult;
         this.y = pos.y*pixMult;
         this.ownerCell = owner.id;
@@ -157,14 +192,14 @@ class StableBlock {
                     style="background-color: red; color: red;
                     width: ${26*pixMult}px; height: ${26*pixMult}px;
                     left: ${this.x}px; bottom: ${this.y}px;
-                    display: block;"></div>`;
+                    "></div>`;
         
         $('#' + owner.htmlId).append(html);
     }
-    
+
 }
 
-class CellCycle {
+class CellCycle extends GameObject {
     
     x;
     y;
@@ -172,6 +207,8 @@ class CellCycle {
     htmlId;
     
     constructor(owner) {
+        super();
+        
         this.x = 31.5*pixMult;
         this.y = 31.5*pixMult;
         this.ownerCell = owner.id;
@@ -183,13 +220,31 @@ class CellCycle {
                     background: url('../textures/cycle.png');
                     background-size: 100% 100%;
                     left: ${this.x}px; bottom: ${this.y}px;
-                    display: block;"></div>`;
+                    "></div>`;
         
         $('#' + owner.htmlId).append(html);
     }
     
 }
 
+class FlyingBlock extends GameObject {
+    constructor(owner, pos, vec2Dest) {
+        super();
+        
+        this.x = owner.x + pos.x;
+        this.y = owner.y + pos.y;
+        this.id = flBlocks.length;
+        this.htmlId = 'flBl' + this.id;
+        
+        var html = `<div id="${this.htmlId}" class="flyingBlock"
+                    style="background-color: red; color: red;
+                    width: ${26*pixMult}px; height: ${26*pixMult}px;
+                    left: ${this.x}px; bottom: ${this.y}px;
+                    "></div>`;
+        
+        $('#flBlocksContainer').append(html);
+    }
+}
 
 
 
@@ -199,3 +254,6 @@ class CellCycle {
 fitToSize();
 
 sceneController.startGame();
+
+
+

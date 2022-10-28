@@ -7,7 +7,7 @@ class SceneController {
         $('#gameContainer').show();
         
         let game = new Game();
-        game.mapSize = 3;
+        game.mapSize = 5;
         game.start();
     }
     

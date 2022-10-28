@@ -47,6 +47,7 @@ html, body {
 }
 #gameSquare, #gameStatistics {
     height: 100%;
+    margin: 0px;
 }
 
 .cell {
@@ -54,13 +55,14 @@ html, body {
     width: 90px;
     height: 90px;
     border: none;
+    margin: 0px;
     z-index: 40;
     background-size: 100% 100%;
     background-color: blue;
     color: blue;
     display: none;
 }
-.stableBlock {
+.stableBlock, .flyingBlock {
     position: absolute;
     width: 26px;
     height: 26px;
@@ -71,6 +73,9 @@ html, body {
     color: red;
     display: none;
 }
+.flyingBlock {
+    display: block;
+}
 .cycle {
     position: absolute;
     width: 27px;
@@ -78,4 +83,5 @@ html, body {
     border: none;
     z-index: 30;
     background-size: 100% 100%;
+    display: none;
 }
